@@ -5,16 +5,14 @@ import java.nio.file.Path;
 
 
 public class Crash {
-	public native boolean isInterface(Class clazz);
+	public native int getVersion();
 
 	static SymbolLookup symbolLookup = SymbolLookup.loaderLookup();
 	static Linker linker = Linker.nativeLinker();
 	static FunctionDescriptor JNI_GetCreatedJavaVMs_DESCRIPTOR = FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS);
 	static FunctionDescriptor GET_JNIENV_DESCRIPTOR = FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT);
 	static FunctionDescriptor GetEnv_DESCRIPTOR = FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,ValueLayout.ADDRESS, ValueLayout.JAVA_INT);
-	static FunctionDescriptor FindClass_DESCRIPTOR = FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS);
-	static FunctionDescriptor IsInterface_DESCRIPTOR = FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS);
-	
+
 	static {
         System.setProperty("java.library.path", ".");
 		Runtime.getRuntime().loadLibrary("myjvmti");
@@ -50,25 +48,25 @@ public class Crash {
 		
 		MemorySegment jniEnvPointer = ((MemorySegment) GET_JNIENV_MH.invokeExact(JavaVM_, 0x00150000)).reinterpret(Long.MAX_VALUE);
 		var JNI_Functions = jniEnvPointer.get(ValueLayout.ADDRESS, 0).reinterpret(Long.MAX_VALUE);
-		var FindClassFp = JNI_Functions.get(ValueLayout.ADDRESS, ADDRESS_SIZE * 6);
-		
 		MethodHandle getEnv_MH = linker.downcallHandle(GetEnv_DESCRIPTOR).bindTo(GetEnvFP);
 		var JVMTI_ENV = global.allocate(ValueLayout.ADDRESS);
 		var _ = (int) getEnv_MH.invokeExact(JavaVM_, JVMTI_ENV, 0x30010000);
 		MemorySegment jvmTiEnvPointer = JVMTI_ENV.get(ValueLayout.ADDRESS, 0).reinterpret(Long.MAX_VALUE);
 		var jvmti_functions = jvmTiEnvPointer.get(ValueLayout.ADDRESS, 0).reinterpret(Long.MAX_VALUE);
-		MemorySegment IsInterfaceS = jvmti_functions.get(ValueLayout.ADDRESS, ADDRESS_SIZE * 54);
-		
-		MethodHandle FindClassMH = linker.downcallHandle(FindClass_DESCRIPTOR).bindTo(FindClassFp);
-		MemorySegment classAddress = (MemorySegment) FindClassMH.invokeExact(jniEnvPointer, global.allocateFrom(Runnable.class.getName().replace(".", "/")));
-		
-		MemorySegment bool = global.allocate(ValueLayout.JAVA_BOOLEAN);
-		
-		MethodHandle IsInterface_MH = linker.downcallHandle(IsInterface_DESCRIPTOR).bindTo(IsInterfaceS);
-		
-		var res = (int) IsInterface_MH.invokeExact(jvmTiEnvPointer, classAddress.reinterpret(8), bool);
-		System.out.println(res);
-		System.out.printf("Runnable is interface by FFI: %s.\n", bool.get(ValueLayout.JAVA_BOOLEAN, 0));
-		System.out.printf("Runnable is interface by JNI: %s.\n ", isInterface(Runnable.class));
+
+
+		var GetVersionNumberPointer = jvmti_functions.get(ValueLayout.ADDRESS, ADDRESS_SIZE * 87);
+		var GetSourcePointer = jvmti_functions.get(ValueLayout.ADDRESS, ADDRESS_SIZE * 49);
+		var GetCapabilitiesPointer = jvmti_functions.get(ValueLayout.ADDRESS, ADDRESS_SIZE * 88);
+		var AddCapabilitiesPointer = jvmti_functions.get(ValueLayout.ADDRESS, ADDRESS_SIZE * 141);
+		var GetVersionNumber_MH = linker.downcallHandle(FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS)).bindTo(GetVersionNumberPointer);
+		var version = global.allocate(ValueLayout.JAVA_INT);
+		var _ = (int)GetVersionNumber_MH.invokeExact(jvmTiEnvPointer, version);
+
+		var newversion = global.allocate(ValueLayout.JAVA_INT);
+		var _ = jvmtiInterface_1_.GetVersionNumber.invoke(GetVersionNumberPointer, jvmTiEnvPointer, newversion);
+		System.out.println(STR."JNI: \{getVersion()}");
+		System.out.println(STR."FFI: \{version.get(ValueLayout.JAVA_INT, 0)}");
+		System.out.println(STR."FFI: \{newversion.get(ValueLayout.JAVA_INT, 0)}");
 	}
 }

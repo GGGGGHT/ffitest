@@ -6,13 +6,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/*
- * Class:     Test
- * Method:    isInterface
- * Signature: (Ljava/lang/Class;)Z
- */
-JNIEXPORT jboolean JNICALL Java_Crash_isInterface
-  (JNIEnv *, jobject, jclass);
+
+JNIEXPORT jboolean JNICALL Java_Crash_getVersion(JNIEnv *, jobject);
+
 
 #ifdef __cplusplus
 }

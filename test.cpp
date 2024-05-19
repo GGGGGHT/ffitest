@@ -4,20 +4,12 @@
 static jvmtiEnv *jvmti_env;
 
 // 假设这是一个DLL的入口函数
+
 extern "C" JNIEXPORT jboolean JNICALL
-Java_Crash_isInterface(JNIEnv* jni_env, jobject obj, jclass klass) {
-// Java_com_example_MyAgent_isInterface(JNIEnv* jni_env, jobject obj, jclass klass) {
-    jvmtiError error;
-
-
-    // 调用IsInterface函数
-    jboolean is_interface;
-    error = jvmti_env->IsInterface(klass, &is_interface);
-    if (error != JVMTI_ERROR_NONE) {
-        return JNI_FALSE;
-    }
-
-    return is_interface;
+Java_Crash_getVersion(JNIEnv* jni_env, jobject obj) {
+    jint res;
+    jvmti_env->GetVersionNumber(&res);
+    return res;
 }
 
 
