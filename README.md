@@ -7,6 +7,10 @@ openjdk version "22" 2024-03-19 <br/>
 OpenJDK Runtime Environment GraalVM CE 22+36.1 (build 22+36-jvmci-b02)<br/>
 OpenJDK 64-Bit Server VM GraalVM CE 22+36.1 (build 22+36-jvmci-b02, mixed mode, sharing)
 
+### jextract[^3]
+```
+jextract -t org.openjdk.jvmti -I ${JAVA_HOME}/include/linux ${JAVA_HOME}/include/jvmti.h
+```
 
 ### generate dynamic library
 ```sh
@@ -22,3 +26,4 @@ java --enable-native-access=ALL-UNNAMED --enable-preview --source 22 Crash.java
 
 [^1]: https://openjdk.org/jeps/454
 [^2]: https://docs.oracle.com/javase/8/docs/platform/jvmti/jvmti.html
+[^3]: https://jdk.java.net/jextract
