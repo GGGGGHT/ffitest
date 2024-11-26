@@ -1,12 +1,12 @@
 #include <jvmti.h>
-#include "crash.h"
+#include "Crash.h"
 
 static jvmtiEnv *jvmti_env;
 
 // 假设这是一个DLL的入口函数
 
-extern "C" JNIEXPORT jboolean JNICALL
-Java_Crash_getVersion(JNIEnv* jni_env, jobject obj) {
+extern "C" JNIEXPORT jint JNICALL
+Java_Crash_getVersion(JNIEnv* jni_env, jclass obj) {
     jint res;
     jvmti_env->GetVersionNumber(&res);
     return res;

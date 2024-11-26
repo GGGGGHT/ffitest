@@ -8288,7 +8288,16 @@ public class jvmti_h {
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
-
+    
+    private static class JNI_GetJNINativeInterface_ {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                jvmti_h.C_POINTER
+        );
+        
+        public static final MemorySegment ADDR = jvmti_h.findOrThrow("jni_functions");
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+   
     /**
      * Function descriptor for:
      * {@snippet lang=c :
@@ -8335,7 +8344,7 @@ public class jvmti_h {
            throw new AssertionError("should not reach here", ex$);
         }
     }
-
+    
     private static class JNI_OnLoad {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
             jvmti_h.C_INT,
