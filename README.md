@@ -22,7 +22,7 @@ java --enable-native-access=ALL-UNNAMED IterateInstance.java
 ```
 
 ### end
-> During the execution of this function the state of the heap does not change: no objects are allocated, no objects are garbage collected, and the state of objects (including held values) does not change. As a result, threads executing Java programming language code, threads attempting to resume the execution of Java programming language code, and threads attempting to execute JNI functions are typically stalled.
+> During the execution of this function the state of the heap does not change: no objects are allocated, no objects are garbage collected, and the state of objects (including held values) does not change. As a result, threads executing Java programming language code, threads attempting to resume the execution of Java programming language code, and threads attempting to execute JNI functions are typically stalled.[^4]
 ![img.png](img.png)
 
 在执行此函数期间，堆的状态不会改变：不会分配任何对象，不会对任何对象进行垃圾回收，并且对象的状态（包括保存的值）不会改变。因此，执行 Java 编程语言代码的线程、尝试恢复 Java 编程语言代码执行的线程以及尝试执行 JNI 函数的线程通常会停滞。
